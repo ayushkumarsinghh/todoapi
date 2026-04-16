@@ -1,12 +1,37 @@
+### Add Todo
 POST http://localhost:3000/todos
 Content-Type: application/json
 
 {
   "task": "gym"
-} 
+}
 
 ###
-DELETE http://localhost:3000/todos/0
+
+### Get All Todos
+GET http://localhost:3000/todos
 
 ###
-PUT http://localhost:3000/todos/0
+
+### Get Todo by ID
+GET http://localhost:3000/todos/1
+
+###
+
+### Delete Todo by ID
+DELETE http://localhost:3000/todos/1
+
+###
+
+### Mark Todo as Done
+PATCH http://localhost:3000/todos/1
+
+###
+
+### Update Todo
+PUT http://localhost:3000/todos/3
+Content-Type: application/json
+
+{
+  "task": "study"
+}
