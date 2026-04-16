@@ -1,9 +1,14 @@
-let todos = [];
-let nextId = 1;
+const Todo = require("../models/Todo");
 
 // Get all todos
-exports.getTodos = (req, res) => {
-    return res.json(todos);
+exports.getTodos = async (req, res) => {
+    try {
+        const todos = await Todo.find();
+
+        return res.json(todos);
+    } catch (error) {
+        return res.status(500).json({ message: "Server error" });
+    }
 };
 
 // Get todo by ID
@@ -24,92 +29,98 @@ exports.getTodoById = (req, res) => {
 };
 
 // Add todo
-exports.addTodo = (req, res) => {
+exports.addTodo = async (req, res) => {
     const task = req.body.task;
 
     if (!task || task.trim() === "") {
         return res.status(400).json({ message: "Task cannot be empty" });
     }
 
-    const id = nextId++;
-    
-    const newTodo = {
-        id,
-        task,
-        done: false
-    };
+    try {
+        const newTodo = new Todo({ task });
 
-    todos.push(newTodo);
+        await newTodo.save();
 
-    return res.json({
-        message: "Todo added",
-        data: newTodo
-    });
+        return res.json({
+            message: "Todo added",
+            data: newTodo
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: "Server error" });
+    }
 };
 
 // Delete todo by ID
-exports.deleteTodo = (req, res) => {
-    const id = Number(req.params.id);
+exports.deleteTodo = async (req, res) => {
+    const id = req.params.id;
 
-    if (isNaN(id)) {
+    try {
+        const deletedTodo = await Todo.findByIdAndDelete(id);
+
+        if (!deletedTodo) {
+            return res.status(404).json({ message: "Todo not found" });
+        }
+
+        return res.json({
+            message: "Todo deleted",
+            data: deletedTodo
+        });
+
+    } catch (error) {
         return res.status(400).json({ message: "Invalid ID" });
     }
-
-    const index = todos.findIndex(t => t.id === id);
-
-    if (index === -1) {
-        return res.status(404).json({ message: "Todo not found" });
-    }
-
-    todos.splice(index, 1);
-
-    return res.json({
-        message: "Todo deleted",
-        data: { id }
-    });
 };
-
 // Mark todo as done
-exports.markDone = (req, res) => {
-    const id = Number(req.params.id);
+exports.markDone = async (req, res) => {
+    const id = req.params.id;
 
-    if (isNaN(id)) {
+    try {
+        const updatedTodo = await Todo.findByIdAndUpdate(
+            id,
+            { done: true },
+            { new: true }
+        );
+
+        if (!updatedTodo) {
+            return res.status(404).json({ message: "Todo not found" });
+        }
+
+        return res.json({
+            message: "Todo marked as done",
+            data: updatedTodo
+        });
+
+    } catch (error) {
         return res.status(400).json({ message: "Invalid ID" });
     }
-
-    const todo = todos.find(t => t.id === id);
-
-    if (!todo) {
-        return res.status(404).json({ message: "Todo not found" });
-    }
-
-    todo.done = true;
-
-    return res.json({
-        message: "Todo marked as done",
-        data: todo
-    });
 };
-exports.updateTodo = (req, res) => {
-    const id = Number(req.params.id);
 
-    if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid ID" });
-    }
-
+exports.updateTodo = async (req, res) => {
+    const id = req.params.id;
     const task = req.body.task;
 
     if (!task || task.trim() === "") {
         return res.status(400).json({ message: "Task cannot be empty" });
     }
 
-    const todo = todos.find(t => t.id === id);
+    try {
+        const updatedTodo = await Todo.findByIdAndUpdate(
+            id,
+            { task },
+            { new: true }
+        );
 
-    if (!todo) {
-        return res.status(404).json({ message: "Todo not found" });
+        if (!updatedTodo) {
+            return res.status(404).json({ message: "Todo not found" });
+        }
+
+        return res.json({
+            message: "Todo updated successfully",
+            data: updatedTodo
+        });
+
+    } catch (error) {
+        return res.status(400).json({ message: "Invalid ID" });
     }
-
-    todo.task = task;
-
-    return res.json(todo);
 };
