@@ -35,3 +35,25 @@ Content-Type: application/json
 {
   "task": "study"
 }
+
+###
+POST http://localhost:3000/signup
+Content-Type: application/json
+
+{
+  "username": "ayush",
+  "email": "ayush@test6.com",
+  "password": "1234"
+}
+
+###
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "email": "ayush@test6.com",
+  "password": "1234"
+}
+### Get Todos WITHOUT token (should fail)
+GET http://localhost:3000/todos
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTFjZDk0MDE1Y2JhZjNmMWNhODU4MCIsImVtYWlsIjoiYXl1c2hAdGVzdDYuY29tIiwiaWF0IjoxNzc2NDA2ODU0LCJleHAiOjE3NzY0MTA0NTR9.QR_oRMjhT_8cj39dPgS26M65zcBCpqrrNtraLh94gF8
